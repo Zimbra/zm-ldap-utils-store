@@ -1,4 +1,4 @@
-<project name="ZimbraLDAPUtils" default="jar"> <!-- default="jar" -->
+<project name="ZimbraLDAPUtils" default="deploy"> 
 	<property name="jar.file" value="zimbraldaputils.jar" />
 	<property name="src.dir" location="src" />
 	<property name="src.java.dir" location="${src.dir}/java" />
@@ -6,7 +6,9 @@
 	<property name="build.classes.dir" location="${build.dir}/classes" />
 	<property name="common.dir" location="../ZimbraCommon" />
 	<property name="common.classes.dir" location="${common.dir}/build/classes" />
-
+	<property name="zimbra.home.dir" location="/opt/zimbra" />	
+	<property name="extension.deploy.dir" location="${zimbra.home.dir}/lib/ext/zimbraldaputils"/>
+	
 	<path id="all.java.path">
 		<pathelement location="${src.java.dir}" />
 	</path>
@@ -46,6 +48,15 @@
 		<jar manifest="conf/MANIFEST.MF" destfile="${build.dir}/${jar.file}" basedir="${build.classes.dir}" />
 	</target>
 
+	<!-- deploy the extension -->
+	<target name="deploy" depends="jar" description="Deploy the extension">
+		<ant dir="${zimbraServer.dir}" target="stop-tomcat" inheritAll="false"/>
+		<copy todir="${extension.deploy.dir}">
+			<fileset dir="${build.dir}" includes="${jar.file}" />
+		</copy>
+		<ant dir="${zimbraServer.dir}" target="start-tomcat" inheritAll="false"/>
+	</target>
+	
 	<target name="clean" description="Removes any temporary files">
 		<delete dir="${build.dir}" />
 	</target>

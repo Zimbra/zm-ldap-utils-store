@@ -66,9 +66,7 @@ public class GetLDAPEntries extends AdminDocumentHandler {
     	return response;
     }
 
-    /* (non-Javadoc)
-     * @see com.zimbra.cs.account.Provisioning#searchAccounts(java.lang.String)
-     */
+    
     List<NamedEntry> searchObjects(String query,String base)
     throws ServiceException {
         final List<NamedEntry> result = new ArrayList<NamedEntry>();
@@ -85,9 +83,7 @@ public class GetLDAPEntries extends AdminDocumentHandler {
         return result;
     }
     
-    /* (non-Javadoc)
-     * @see om.zimbra.samba.GetLDAPEntrys#searchObjects(java.lang.String)
-     */
+
     void searchObjects(String query,  String base, NamedEntry.Visitor visitor)
         throws ServiceException
     {
@@ -119,7 +115,6 @@ public class GetLDAPEntries extends AdminDocumentHandler {
                         // skip admin accounts
                         if (dn.endsWith("cn=zimbra")) continue;
                         Attributes attrs = sr.getAttributes();
-                        Attribute objectclass = attrs.get("objectclass");
                         visitor.visit(new LDAPEntry(dn, attrs,null));
                     }
                     cookie = getCookie(lctxt);
@@ -131,7 +126,7 @@ public class GetLDAPEntries extends AdminDocumentHandler {
             throw ServiceException.INVALID_REQUEST("invalid search filter "+e.getMessage(), e);
         } catch (NameNotFoundException e) {
             // happens when base doesn't exist
-            ZimbraLog.account.warn("unable to list all objects", e);
+            ZimbraLog.extensions.warn("unable to list all objects", e);
         } catch (SizeLimitExceededException e) {
             throw AccountServiceException.TOO_MANY_SEARCH_RESULTS("too many search results returned", e);
         } catch (NamingException e) {
