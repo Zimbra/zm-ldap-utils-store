@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Iterator;
 
+import javax.naming.InvalidNameException;
 import javax.naming.NameNotFoundException;
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
@@ -35,6 +36,7 @@ import com.zimbra.common.service.ServiceException;
 import com.zimbra.common.util.ZimbraLog;
 import com.zimbra.cs.account.AccountServiceException;
 import com.zimbra.cs.account.NamedEntry;
+import com.zimbra.cs.account.Server;
 import com.zimbra.cs.account.ldap.LdapUtil;
 import com.zimbra.soap.Element;
 import com.zimbra.soap.ZimbraSoapContext;
@@ -46,6 +48,9 @@ import com.zimbra.cs.service.admin.AdminService;
  */
 public class GetLDAPEntries extends AdminDocumentHandler {
 	public static final String C_LDAPEntry = "LDAPEntry";
+	
+	private static final SearchControls sObjectSC = new SearchControls(SearchControls.OBJECT_SCOPE, 0, 0, null, false, false);
+	
     public Element handle(Element request, Map<String, Object> context) throws ServiceException {
 
     	ZimbraSoapContext lc = getZimbraSoapContext(context);
@@ -66,8 +71,29 @@ public class GetLDAPEntries extends AdminDocumentHandler {
     	return response;
     }
 
+    public static NamedEntry getObjectByDN(String dn, DirContext initCtxt) throws ServiceException {
+        DirContext ctxt = initCtxt;
+        try {
+            if (ctxt == null)
+                ctxt = LdapUtil.getDirContext();
+               
+            Attributes attrs = ctxt.getAttributes(dn);
+            NamedEntry ne = new LDAPEntry(dn, attrs,null);
+            return ne;
+            
+        } catch (NameNotFoundException e) {
+            return null;
+        } catch (InvalidNameException e) {
+            return null;                        
+        } catch (NamingException e) {
+            throw ServiceException.FAILURE("unable to find dn: "+dn+" message: "+e.getMessage(), e);
+        } finally {
+            if (initCtxt == null)
+                LdapUtil.closeContext(ctxt);
+        }
+    }
     
-    List<NamedEntry> searchObjects(String query,String base)
+    public List<NamedEntry> searchObjects(String query,String base)
     throws ServiceException {
         final List<NamedEntry> result = new ArrayList<NamedEntry>();
         

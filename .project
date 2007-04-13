@@ -3,6 +3,8 @@
 	<name>ZimbraLDAPUtilsExtension</name>
 	<comment></comment>
 	<projects>
+		<project>ZimbraCommon</project>
+		<project>ZimbraServer</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>
