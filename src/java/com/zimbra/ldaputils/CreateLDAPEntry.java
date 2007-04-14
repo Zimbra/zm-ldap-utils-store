@@ -30,7 +30,7 @@ import com.zimbra.soap.Element;
 import com.zimbra.soap.ZimbraSoapContext;
 import com.zimbra.cs.account.NamedEntry;
 
-public class CreateLDAPEntries extends AdminDocumentHandler {
+public class CreateLDAPEntry extends AdminDocumentHandler {
 
 	public Element handle(Element request, Map<String, Object> context)
 			throws ServiceException {
