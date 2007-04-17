@@ -87,14 +87,14 @@ public class GetLDAPEntries extends AdminDocumentHandler {
     	return response;
     }
 
-    public static NamedEntry getObjectByDN(String dn, DirContext initCtxt) throws ServiceException {
+    public static LDAPEntry getObjectByDN(String dn, DirContext initCtxt) throws ServiceException {
         DirContext ctxt = initCtxt;
         try {
             if (ctxt == null)
                 ctxt = LdapUtil.getDirContext();
                
             Attributes attrs = ctxt.getAttributes(dn);
-            NamedEntry ne = new LDAPEntry(dn, attrs,null);
+            LDAPEntry ne = new LDAPEntry(dn, attrs,null);
             return ne;
             
         } catch (NameNotFoundException e) {
