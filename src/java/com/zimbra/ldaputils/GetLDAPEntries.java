@@ -12,16 +12,17 @@ package com.zimbra.ldaputils;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.Iterator;
 
 import javax.naming.InvalidNameException;
 import javax.naming.NameNotFoundException;
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
 import javax.naming.SizeLimitExceededException;
-import javax.naming.directory.Attribute;
 import javax.naming.directory.Attributes;
 import javax.naming.directory.DirContext;
 import javax.naming.directory.InvalidSearchFilterException;
@@ -34,14 +35,18 @@ import javax.naming.ldap.PagedResultsResponseControl;
 
 import com.zimbra.common.service.ServiceException;
 import com.zimbra.common.util.ZimbraLog;
+
 import com.zimbra.cs.account.AccountServiceException;
 import com.zimbra.cs.account.NamedEntry;
-import com.zimbra.cs.account.Server;
+import com.zimbra.cs.account.Provisioning;
+
 import com.zimbra.cs.account.ldap.LdapUtil;
 import com.zimbra.soap.Element;
 import com.zimbra.soap.ZimbraSoapContext;
+
 import com.zimbra.cs.service.admin.AdminDocumentHandler;
 import com.zimbra.cs.service.admin.AdminService;
+
 
 /**
  * @author Greg Solovyev
@@ -49,25 +54,36 @@ import com.zimbra.cs.service.admin.AdminService;
 public class GetLDAPEntries extends AdminDocumentHandler {
 	public static final String C_LDAPEntry = "LDAPEntry";
 	
-	private static final SearchControls sObjectSC = new SearchControls(SearchControls.OBJECT_SCOPE, 0, 0, null, false, false);
-	
     public Element handle(Element request, Map<String, Object> context) throws ServiceException {
 
     	ZimbraSoapContext lc = getZimbraSoapContext(context);
         
     	Element b = request.getElement(ZimbraLDAPUtilsService.E_LDAPSEARCHBASE);
         String ldapSearchBase = b.getText();
-        
+        String sortBy = request.getAttribute(AdminService.A_SORT_BY, null);
+        boolean sortAscending = request.getAttributeBool(AdminService.A_SORT_ASCENDING, true);
+        int limit = (int) request.getAttributeLong(AdminService.A_LIMIT, Integer.MAX_VALUE);
+        if (limit == 0)
+            limit = Integer.MAX_VALUE;
+
+        int offset = (int) request.getAttributeLong(AdminService.A_OFFSET, 0);
         String query = request.getAttribute(AdminService.E_QUERY);
+
         List LDAPEntrys;
-        LDAPEntrys = searchObjects(query,ldapSearchBase);
-        
+        LDAPEntrys = searchObjects(query,ldapSearchBase,sortBy,sortAscending);
+     
     	Element response = lc.createElement(ZimbraLDAPUtilsService.GET_LDAP_ENTRIES_RESPONSE);
-    	Iterator it = LDAPEntrys.iterator();
+        int i, limitMax = offset+limit;
+        for (i=offset; i < limitMax && i < LDAPEntrys.size(); i++) {
+            NamedEntry entry = (NamedEntry) LDAPEntrys.get(i);
+            ZimbraLDAPUtilsService.encodeLDAPEntry(response,entry);
+        }  
+        
+/*    	Iterator it = LDAPEntrys.iterator();
     	while(it.hasNext()) {
     		ZimbraLDAPUtilsService.encodeLDAPEntry(response,(LDAPEntry)it.next());
     	}
-    	
+    	*/
     	return response;
     }
 
@@ -93,7 +109,7 @@ public class GetLDAPEntries extends AdminDocumentHandler {
         }
     }
     
-    public List<NamedEntry> searchObjects(String query,String base)
+    public List<NamedEntry> searchObjects(String query,String base, final String sortAttr, final boolean sortAscending)
     throws ServiceException {
         final List<NamedEntry> result = new ArrayList<NamedEntry>();
         
@@ -105,11 +121,30 @@ public class GetLDAPEntries extends AdminDocumentHandler {
         
         searchObjects(query,  base,  visitor);
 
-       
+        final boolean byName = sortAttr == null || sortAttr.equals("name"); 
+        Comparator<NamedEntry> comparator = new Comparator<NamedEntry>() {
+            public int compare(NamedEntry oa, NamedEntry ob) {
+                NamedEntry a = (NamedEntry) oa;
+                NamedEntry b = (NamedEntry) ob;
+                int comp = 0;
+                if (byName)
+                    comp = a.getName().compareToIgnoreCase(b.getName());
+                else {
+                    String sa = a.getAttr(sortAttr);
+                    String sb = b.getAttr(sortAttr);
+                    if (sa == null) sa = "";
+                    if (sb == null) sb = "";
+                    comp = sa.compareToIgnoreCase(sb);
+                }
+                return sortAscending ? comp : -comp;
+            }
+        };
+        Collections.sort(result, comparator);        
         return result;
+
     }
     
-
+    
     void searchObjects(String query,  String base, NamedEntry.Visitor visitor)
         throws ServiceException
     {
@@ -120,13 +155,15 @@ public class GetLDAPEntries extends AdminDocumentHandler {
             SearchControls searchControls = 
                 new SearchControls(SearchControls.SUBTREE_SCOPE, 0, 0, null, false, false);
 
-            //Set the page size and initialize the cookie that we pass back in subsequent pages
+            // Set the page size and initialize the cookie that we pass back in
+			// subsequent pages
             int pageSize = 1000;
             byte[] cookie = null;
  
             LdapContext lctxt = (LdapContext)ctxt; 
  
-            // we don't want to ever cache any of these, since they might not have all their attributes
+            // we don't want to ever cache any of these, since they might not
+			// have all their attributes
 
             NamingEnumeration ne = null;
 
@@ -141,7 +178,16 @@ public class GetLDAPEntries extends AdminDocumentHandler {
                         // skip admin accounts
                         if (dn.endsWith("cn=zimbra")) continue;
                         Attributes attrs = sr.getAttributes();
-                        visitor.visit(new LDAPEntry(dn, attrs,null));
+
+                        if(Arrays.binarySearch(LdapUtil.getMultiAttrString(attrs, Provisioning.A_objectClass), "sambaDomain") > -1) {
+                        	visitor.visit(new SambaDomain(dn, attrs,null));                        
+                    	} else if(Arrays.binarySearch(LdapUtil.getMultiAttrString(attrs, Provisioning.A_objectClass), "posixGroup") > -1) {
+                        	visitor.visit(new PosixGroup(dn, attrs,null));
+                    	} else if(Arrays.binarySearch(LdapUtil.getMultiAttrString(attrs, Provisioning.A_objectClass), "posixAccount") > -1) {
+                        	visitor.visit(new PosixAccount(dn, attrs,null));
+                    	} else {
+                        	visitor.visit(new LDAPEntry(dn, attrs,null));
+                        }
                     }
                     cookie = getCookie(lctxt);
                 } while (cookie != null);
@@ -176,5 +222,5 @@ public class GetLDAPEntries extends AdminDocumentHandler {
             }
         }
         return null;
-    }    
+    }  
 }

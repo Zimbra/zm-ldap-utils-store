@@ -46,7 +46,7 @@ import com.zimbra.cs.account.ldap.LdapUtil;
  */
 public class LDAPEntry extends NamedEntry  {
 
-    private String mDn;
+    protected String mDn;
 
     LDAPEntry(String dn, Attributes attrs, Map<String, Object> defaults) throws NamingException {
         super(LdapUtil.getAttrString(attrs, Provisioning.A_cn),
