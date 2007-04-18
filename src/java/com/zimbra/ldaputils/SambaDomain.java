@@ -6,9 +6,10 @@ import javax.naming.NamingException;
 import javax.naming.directory.Attributes;
 
 import com.zimbra.cs.account.NamedEntry;
-import com.zimbra.cs.account.Provisioning;
 import com.zimbra.cs.account.ldap.LdapUtil;
-
+/**
+ * @author Greg Solovyev
+ */
 public class SambaDomain extends LDAPEntry {
 
 	private static final String A_sambaSID = "sambaSID";

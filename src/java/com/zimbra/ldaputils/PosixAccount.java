@@ -6,7 +6,9 @@ import javax.naming.NamingException;
 import javax.naming.directory.Attributes;
 
 import com.zimbra.cs.account.ldap.LdapUtil;
-
+/**
+ * @author Greg Solovyev
+ */
 public class PosixAccount extends LDAPEntry {
 	private static final String A_uidNumber = "uidNumber";
 	public PosixAccount(String dn, Attributes attrs,

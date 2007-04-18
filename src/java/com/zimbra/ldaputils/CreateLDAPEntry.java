@@ -19,7 +19,6 @@ import com.zimbra.common.service.ServiceException;
 import com.zimbra.common.util.ZimbraLog;
 import com.zimbra.cs.account.AccountServiceException;
 import com.zimbra.cs.account.AttributeManager;
-import com.zimbra.cs.account.Provisioning;
 
 import com.zimbra.cs.account.ldap.LdapUtil;
 
@@ -29,7 +28,9 @@ import com.zimbra.cs.service.admin.AdminService;
 import com.zimbra.soap.Element;
 import com.zimbra.soap.ZimbraSoapContext;
 import com.zimbra.cs.account.NamedEntry;
-
+/**
+ * @author Greg Solovyev
+ */
 public class CreateLDAPEntry extends AdminDocumentHandler {
 
 	public Element handle(Element request, Map<String, Object> context)

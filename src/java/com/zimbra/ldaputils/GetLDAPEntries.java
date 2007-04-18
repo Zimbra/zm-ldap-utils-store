@@ -79,11 +79,6 @@ public class GetLDAPEntries extends AdminDocumentHandler {
             ZimbraLDAPUtilsService.encodeLDAPEntry(response,entry);
         }  
         
-/*    	Iterator it = LDAPEntrys.iterator();
-    	while(it.hasNext()) {
-    		ZimbraLDAPUtilsService.encodeLDAPEntry(response,(LDAPEntry)it.next());
-    	}
-    	*/
     	return response;
     }
 

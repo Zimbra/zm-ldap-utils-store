@@ -5,9 +5,10 @@ import java.util.Map;
 import javax.naming.NamingException;
 import javax.naming.directory.Attributes;
 
-import com.zimbra.cs.account.NamedEntry;
 import com.zimbra.cs.account.ldap.LdapUtil;
-
+/**
+ * @author Greg Solovyev
+ */
 public class PosixGroup extends LDAPEntry {
 	private static final String A_gidNumber = "gidNumber";
 

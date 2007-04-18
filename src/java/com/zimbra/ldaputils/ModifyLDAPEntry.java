@@ -14,7 +14,9 @@ import com.zimbra.cs.service.admin.AdminDocumentHandler;
 import com.zimbra.cs.service.admin.AdminService;
 import com.zimbra.soap.Element;
 import com.zimbra.soap.ZimbraSoapContext;
-
+/**
+ * @author Greg Solovyev
+ */
 public class ModifyLDAPEntry extends AdminDocumentHandler {
 
 	public Element handle(Element request, Map<String, Object> context)

@@ -41,6 +41,9 @@ public class ZimbraLDAPUtilsService implements DocumentService {
     public static final QName RENAME_LDAP_ENTRIY_REQUEST = QName.get("RenameLDAPEntryRequest", NAMESPACE);
     public static final QName RENAME_LDAP_ENTRY_RESPONSE = QName.get("RenameLDAPEntryResponse", NAMESPACE);
     
+    public static final QName DELETE_LDAP_ENTRIY_REQUEST = QName.get("DeleteLDAPEntryRequest", NAMESPACE);
+    public static final QName DELETE_LDAP_ENTRY_RESPONSE = QName.get("DeleteLDAPEntryResponse", NAMESPACE);
+    
     public static final String E_LDAPEntry = "LDAPEntry";
     public static final String E_DN = "dn";
     public static final String E_NEW_DN = "new_dn";    
@@ -51,7 +54,8 @@ public class ZimbraLDAPUtilsService implements DocumentService {
 		dispatcher.registerHandler(GET_LDAP_ENTRIES_REQUEST, new GetLDAPEntries());
 		dispatcher.registerHandler(CREATE_LDAP_ENTRIY_REQUEST, new CreateLDAPEntry());		
 		dispatcher.registerHandler(MODIFY_LDAP_ENTRIY_REQUEST, new ModifyLDAPEntry());		
-		dispatcher.registerHandler(RENAME_LDAP_ENTRIY_REQUEST, new RenameLDAPEntry());		
+		dispatcher.registerHandler(RENAME_LDAP_ENTRIY_REQUEST, new RenameLDAPEntry());
+		dispatcher.registerHandler(DELETE_LDAP_ENTRIY_REQUEST, new DeleteLDAPEntry());	
     }
 
     public static Element encodeLDAPEntry(Element parent, NamedEntry ld) {
