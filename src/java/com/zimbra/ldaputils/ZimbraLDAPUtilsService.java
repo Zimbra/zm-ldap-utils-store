@@ -44,7 +44,6 @@ public class ZimbraLDAPUtilsService implements DocumentService {
     public static final String E_LDAPEntry = "LDAPEntry";
     public static final String E_DN = "dn";
     public static final String E_NEW_DN = "new_dn";    
-    public static final String E_OBJECT_CLASS = "objectClass";    
     public static final String E_LDAPSEARCHBASE = "ldapSearchBase";    
     
 

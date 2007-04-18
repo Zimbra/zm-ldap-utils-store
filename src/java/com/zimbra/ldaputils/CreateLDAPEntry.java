@@ -38,11 +38,10 @@ public class CreateLDAPEntry extends AdminDocumentHandler {
 		ZimbraSoapContext lc = getZimbraSoapContext(context);
 	    	    
 	    String dn = request.getAttribute(ZimbraLDAPUtilsService.E_DN);
-	    String oc = request.getAttribute(ZimbraLDAPUtilsService.E_OBJECT_CLASS);
 	    Map<String, Object> attrs = AdminService.getAttrs(request, true);
 	    
 	    
-	    NamedEntry ne = createLDAPEntry(dn, oc , attrs);
+	    NamedEntry ne = createLDAPEntry(dn,  attrs);
 
         ZimbraLog.security.info(ZimbraLog.encodeAttrs(
                 new String[] {"cmd", "CreateLDAPEntry","dn", dn}, attrs));
@@ -55,7 +54,7 @@ public class CreateLDAPEntry extends AdminDocumentHandler {
 	}
 	
 
-    public NamedEntry createLDAPEntry(String dn, String objectClass, Map<String, Object> entryAttrs) throws ServiceException {
+    public NamedEntry createLDAPEntry(String dn, Map<String, Object> entryAttrs) throws ServiceException {
         HashMap attrManagerContext = new HashMap();
         AttributeManager.getInstance().preModify(entryAttrs, null, attrManagerContext, true, true);
 
@@ -65,7 +64,6 @@ public class CreateLDAPEntry extends AdminDocumentHandler {
 
             Attributes attrs = new BasicAttributes(true);
             LdapUtil.mapToAttrs(entryAttrs, attrs);
-            LdapUtil.addAttr(attrs, Provisioning.A_objectClass, objectClass);
 
             createSubcontext(ctxt, dn, attrs, "createLDAPEntry");
 
