@@ -73,8 +73,15 @@ public class GetLDAPEntries extends AdminDocumentHandler {
     		ldapSearchBase = b.getText();
     	}
         String sortBy = request.getAttribute(AdminConstants.A_SORT_BY, null);
+        ZimbraLog.extensions.debug("GetLDAPEntriesRequest sorting by  " + sortBy);
         boolean sortAscending = request.getAttributeBool(AdminConstants.A_SORT_ASCENDING, true);
+        if(sortAscending) {
+        	ZimbraLog.extensions.debug("GetLDAPEntriesRequest sorting ascending  " );
+        } else {
+        	ZimbraLog.extensions.debug("GetLDAPEntriesRequest sorting descending" );
+        }
         int limit = (int) request.getAttributeLong(AdminConstants.A_LIMIT, Integer.MAX_VALUE);
+        ZimbraLog.extensions.debug("GetLDAPEntriesRequest limit  " + limit);
         if (limit == 0)
             limit = Integer.MAX_VALUE;
 
@@ -141,9 +148,25 @@ public class GetLDAPEntries extends AdminDocumentHandler {
                 NamedEntry a = (NamedEntry) oa;
                 NamedEntry b = (NamedEntry) ob;
                 int comp = 0;
-                if (byName)
+                if (byName) {
                     comp = a.getName().compareToIgnoreCase(b.getName());
-                else {
+                } else if(sortAttr.equalsIgnoreCase("uidNumber")) {
+                	Integer ia = 0;
+                	Integer ib = 0;
+                    try {
+                    	ia = Integer.parseInt(a.getAttr(sortAttr));
+                    } catch (NumberFormatException nfe) {
+                    	ZimbraLog.extensions.error("object " + a.getName() + " has an invalid uidNumber", nfe);
+                    }
+                    try {
+                    	ib = Integer.parseInt(b.getAttr(sortAttr));
+                    } catch (NumberFormatException nfe) {
+                    	ZimbraLog.extensions.error("object " + a.getName() + " has an invalid uidNumber", nfe);
+                    }
+                    if (ia == null) ia = 0;
+                    if (ib == null) ib = 0;
+                    comp = ia.compareTo(ib);
+                } else {
                     String sa = a.getAttr(sortAttr);
                     String sb = b.getAttr(sortAttr);
                     if (sa == null) sa = "";
