@@ -16,11 +16,11 @@
 			<attribute name="javadoc_location" value="http://www.json.org/javadoc/"/>
 		</attributes>
 	</classpathentry>
-        <classpathentry kind="lib" path="/ZimbraCommon/jars-internal/jars/junit-4.8.2.jar" sourcepath="/ZimbraCommon/jars-internal/jars-src/junit-4.8.2-src.jar">
-                <attributes>
-                        <attribute name="javadoc_location" value="http://kentbeck.github.com/junit/javadoc/latest/"/>
-                </attributes>
-        </classpathentry>
+	<classpathentry kind="lib" path="/ZimbraCommon/jars/junit-4.8.2.jar" sourcepath="/ZimbraCommon/jars-src/junit-4.8.2-src.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="https://junit.ci.cloudbees.com/job/JUnit/javadoc/"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry combineaccessrules="false" kind="src" path="/ZimbraClient"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>
