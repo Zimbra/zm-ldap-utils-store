@@ -27,7 +27,7 @@
 		<pathelement location="${client.classes.dir}" />
 		<pathelement location="${common.classes.dir}" />
 		<pathelement location="${build.classes.dir}" />
-		<pathelement location="${zimbraServer.dir}/build/classes"/>
+		<pathelement location="${server.classes.dir}"/>
 		<fileset dir="${common.dir}/jars">
 			<include name="**/*.jar"/>
 		</fileset>
