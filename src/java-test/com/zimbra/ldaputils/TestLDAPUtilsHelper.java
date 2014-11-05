@@ -51,6 +51,7 @@ import com.zimbra.qa.unittest.TestUtil;
  *
  */
 
+@Ignore("requires running ldap")
 public class TestLDAPUtilsHelper extends TestLdap {
 
     private static LdapProv prov;
