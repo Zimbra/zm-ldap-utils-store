@@ -14,25 +14,24 @@
  * If not, see <http://www.gnu.org/licenses/>.
  * ***** END LICENSE BLOCK *****
  */
-package com.zimbra.ldaputils;
+package com.zimbra.qa.unittest;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.junit.*;
+import junit.framework.TestCase;
 
-import com.zimbra.common.service.ServiceException;
 import com.zimbra.cs.account.Account;
-import com.zimbra.cs.account.Config;
 import com.zimbra.cs.account.Domain;
 import com.zimbra.cs.account.NamedEntry;
 import com.zimbra.cs.account.Provisioning;
 import com.zimbra.cs.account.ldap.LdapObjectClass;
 import com.zimbra.cs.account.ldap.LdapProv;
-import com.zimbra.ldaputils.LDAPUtilsHelper;
 import com.zimbra.qa.unittest.TestLdap;
 import com.zimbra.qa.unittest.TestUtil;
+import com.zimbra.ldaputils.*;
 
 import static org.junit.Assert.*;
 
@@ -50,7 +49,7 @@ import static org.junit.Assert.*;
  * 
  */
 
-public class TestLDAPUtilsHelper extends TestLdap {
+public class TestLDAPUtilsHelper extends TestCase {
 
     private static LdapProv prov;
     private static Domain domain;
