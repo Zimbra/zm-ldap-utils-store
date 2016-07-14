@@ -46,11 +46,11 @@ import com.zimbra.cs.ldap.ZLdapContext;
 import com.zimbra.cs.ldap.ZMutableEntry;
 import com.zimbra.cs.ldap.ZSearchScope;
 
-abstract class LDAPUtilsHelper {
+public abstract class LDAPUtilsHelper {
 
     private static LDAPUtilsHelper SINGLETON = null;
 
-    static synchronized LDAPUtilsHelper getInstance() {
+    public static synchronized LDAPUtilsHelper getInstance() {
         if (SINGLETON == null) {
             SINGLETON = new ZLDAPUtilsHelper();
         }
@@ -58,21 +58,21 @@ abstract class LDAPUtilsHelper {
         return SINGLETON;
     }
 
-    abstract NamedEntry createLDAPEntry(String dn, Map<String, Object> entryAttrs)
+    public abstract NamedEntry createLDAPEntry(String dn, Map<String, Object> entryAttrs)
     throws ServiceException;
 
-    abstract void deleteLDAPEntry(String dn) throws ServiceException;
+    public abstract void deleteLDAPEntry(String dn) throws ServiceException;
 
-    abstract NamedEntry modifyLDAPEntry(String dn,  Map<String, Object> attrs)
+    public abstract NamedEntry modifyLDAPEntry(String dn,  Map<String, Object> attrs)
     throws ServiceException;
 
-    abstract NamedEntry renameLDAPEntry(String dn,  String newDN)
+    public abstract NamedEntry renameLDAPEntry(String dn,  String newDN)
     throws ServiceException;
 
-    abstract void searchObjects(String query,  String base, NamedEntry.Visitor visitor)
+    public abstract void searchObjects(String query,  String base, NamedEntry.Visitor visitor)
     throws ServiceException;
 
-    List<NamedEntry> searchObjects(String query, String base, final String sortAttr, final boolean sortAscending)
+    public List<NamedEntry> searchObjects(String query, String base, final String sortAttr, final boolean sortAscending)
     throws ServiceException {
         final List<NamedEntry> result = new ArrayList<NamedEntry>();
 
@@ -112,7 +112,7 @@ abstract class LDAPUtilsHelper {
     private static class ZLDAPUtilsHelper extends LDAPUtilsHelper {
 
         @Override
-        NamedEntry createLDAPEntry(String dn, Map<String, Object> entryAttrs)
+        public NamedEntry createLDAPEntry(String dn, Map<String, Object> entryAttrs)
         throws ServiceException {
             CallbackContext callbackContext = new CallbackContext(CallbackContext.Op.CREATE);
             AttributeManager.getInstance().preModify(entryAttrs, null, callbackContext, true);
@@ -137,7 +137,7 @@ abstract class LDAPUtilsHelper {
         }
 
         @Override
-        void deleteLDAPEntry(String dn) throws ServiceException {
+        public void deleteLDAPEntry(String dn) throws ServiceException {
             ZLdapContext zlc = null;
             try {
                 zlc = LdapClient.getContext(LdapServerType.MASTER, LdapUsage.UNITTEST);
@@ -151,7 +151,7 @@ abstract class LDAPUtilsHelper {
         }
 
         @Override
-        NamedEntry modifyLDAPEntry(String dn, Map<String, Object> attrs)
+        public NamedEntry modifyLDAPEntry(String dn, Map<String, Object> attrs)
         throws ServiceException {
 
             Provisioning prov = Provisioning.getInstance();
@@ -184,7 +184,7 @@ abstract class LDAPUtilsHelper {
         }
 
         @Override
-        NamedEntry renameLDAPEntry(String dn, String newDN)
+        public NamedEntry renameLDAPEntry(String dn, String newDN)
                 throws ServiceException {
             ZLdapContext zlc = null;
             try {
@@ -264,7 +264,7 @@ abstract class LDAPUtilsHelper {
         }
 
         @Override
-        void searchObjects(String query, String base, Visitor visitor)
+        public void searchObjects(String query, String base, Visitor visitor)
                 throws ServiceException {
 
             SearchObjectsVisitor searchObjectsVisitor = new SearchObjectsVisitor(visitor);

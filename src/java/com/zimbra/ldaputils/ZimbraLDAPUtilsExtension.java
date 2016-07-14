@@ -17,9 +17,12 @@
 package com.zimbra.ldaputils;
 
 import com.zimbra.common.service.ServiceException;
+import com.zimbra.common.util.ZimbraLog;
 import com.zimbra.soap.SoapServlet;
 import com.zimbra.cs.extension.ZimbraExtension;
 import com.zimbra.cs.account.AttributeManager;
+import com.zimbra.qa.unittest.TestLDAPUtilsHelper;
+import com.zimbra.qa.unittest.ZimbraSuite;
 /**
  * @author Greg Solovyev
  */
@@ -60,6 +63,12 @@ public class ZimbraLDAPUtilsExtension implements ZimbraExtension {
     	AttributeManager.getInstance().makeDomainAdminModifiable("userPassword");   	
     	
         SoapServlet.addService("AdminServlet", new ZimbraLDAPUtilsService());
+        try {
+            ZimbraSuite.addTest(TestLDAPUtilsHelper.class);
+        } catch (NoClassDefFoundError e) {
+            // Expected in production, because JUnit is not available.
+            ZimbraLog.test.debug("Unable to load ZimbraLDAPUtils SOAP tests.", e);
+        }
     }
 
     public void destroy() {
