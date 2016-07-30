@@ -1,9 +1,8 @@
-<project name="ZimbraLDAPUtils" default="deploy">
+<project name="zm-ldap-utils-store" default="deploy">
   <import file="../zm-zcs/ant-global.xml"/>
   <property name="ext.name" value="zimbraldaputils"/>
   <property name="extension.dist.dir" location="${dist.lib.ext.dir}/${ext.name}"/>
   <property name="extension.deploy.dir" location="${zimbra.home.dir}/lib/ext/${ext.name}"/>
-  <property name="jar.file" value="${ext.name}.jar"/>
 
   <target name="build-init">
     <mkdir dir="${build.classes.dir}"/>
@@ -21,18 +20,20 @@
   </target>
 
   <!-- deploy the extension -->
-  <target name="deploy" depends="jar" description="Deploy the extension">
-    <!-- TODO: need a new way to restart jetty when it is deployed from an RPM/DEB ant dir="${server.dir}" target="stop-webserver" inheritAll="false"/ -->
-    <ant target="deploy-jar"/>
-    <!-- TODO: move this to zm-backup-utililties sql driver="org.mariadb.jdbc.Driver" url="jdbc:mysql://localhost:7306/" userid="root" password="zimbra"
-       classpathref="class.path" onerror="abort" src="${build.dir}/backup-version-init.sql" /-->
-    <!-- ant dir="${server.dir}" target="start-webserver" inheritAll="false"/ -->
+  <target name="undeploy">
+    <ant dir="${server.dir}" target="stop-webserver" inheritAll="false"/>
+    <delete dir="${extension.deploy.dir}" verbose="true"/>
+    <ant dir="${server.dir}" target="start-webserver" inheritAll="false"/>
   </target>
 
-  <target name="deploy-jar" depends="jar" description="Copy the jar file into the extension directory">
+  <target name="deploy" depends="jar,set-dev-version">
+    <ant dir="${server.dir}" target="stop-webserver" inheritAll="false"/>
+    <delete dir="${extension.deploy.dir}" verbose="true"/>
+	<mkdir dir="${extension.deploy.dir}"/>
     <copy todir="${extension.deploy.dir}">
       <fileset dir="${build.dir}" includes="${jar.file}" />
     </copy>
+    <ant dir="${server.dir}" target="start-webserver" inheritAll="false"/>
   </target>
 
   <target name="dist" depends="jar" description="Copies jar to dist dir">
