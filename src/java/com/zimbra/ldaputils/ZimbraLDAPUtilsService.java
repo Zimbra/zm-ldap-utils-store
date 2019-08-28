@@ -1,7 +1,7 @@
 /*
  * ***** BEGIN LICENSE BLOCK *****
  * Zimbra Collaboration Suite Server
- * Copyright (C) 2007, 2008, 2009, 2010, 2011, 2013, 2014, 2016 Synacor, Inc.
+ * Copyright (C) 2007, 2008, 2009, 2010, 2011, 2013, 2014, 2016, 2019 Synacor, Inc.
  *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software Foundation,
@@ -19,6 +19,7 @@ package com.zimbra.ldaputils;
 import java.util.Map;
 
 import com.zimbra.cs.account.NamedEntry;
+import com.zimbra.cs.account.Provisioning;
 import com.zimbra.soap.DocumentDispatcher;
 import com.zimbra.soap.DocumentService;
 import com.zimbra.common.soap.Element;
@@ -44,7 +45,12 @@ public class ZimbraLDAPUtilsService implements DocumentService {
         Map<String, Object> attrs = ld.getAttrs(false);
         for (Map.Entry<String, Object> entry : attrs.entrySet()) {
             String name = entry.getKey();
-            Object value = entry.getValue();
+            Object value;
+            if (name.equals(Provisioning.A_userPassword)) {
+                value = "VALUE-BLOCKED";
+            } else {
+                value = entry.getValue();
+            }
             if (value instanceof String[]) {
                 String sv[] = (String[]) value;
                 for (int i = 0; i < sv.length; i++)

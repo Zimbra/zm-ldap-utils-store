@@ -1,7 +1,7 @@
 /*
  * ***** BEGIN LICENSE BLOCK *****
  * Zimbra Collaboration Suite Server
- * Copyright (C) 2007, 2008, 2009, 2010, 2011, 2013, 2014, 2016 Synacor, Inc.
+ * Copyright (C) 2007, 2008, 2009, 2010, 2011, 2013, 2014, 2016, 2019 Synacor, Inc.
  *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software Foundation,
@@ -18,9 +18,12 @@ package com.zimbra.ldaputils;
 
 import java.util.Map;
 
+import com.zimbra.common.localconfig.LC;
 import com.zimbra.common.service.ServiceException;
 import com.zimbra.common.util.ZimbraLog;
+import com.zimbra.cs.account.AuthToken;
 import com.zimbra.cs.account.NamedEntry;
+import com.zimbra.cs.mailbox.OperationContext;
 import com.zimbra.cs.service.admin.AdminDocumentHandler;
 import com.zimbra.cs.service.admin.AdminService;
 import com.zimbra.common.soap.Element;
@@ -35,11 +38,20 @@ public class ModifyLDAPEntry extends AdminDocumentHandler {
             throws ServiceException {
 
         ZimbraSoapContext lc = getZimbraSoapContext(context);
+        OperationContext octxt = getOperationContext(lc, context);
+        AuthToken authToken = octxt.getAuthToken();
+        boolean allowAccess = LC.enable_delegated_admin_ldap_access.booleanValue();
+        if(octxt.getAuthToken().isDelegatedAdmin() && !allowAccess) {
+            throw ServiceException.PERM_DENIED("Delegated admin not can not modify LDAP");
+        }
         String dn = request.getAttribute(LDAPUtilsConstants.E_DN);
         if(dn==null)
             throw ServiceException.INVALID_REQUEST("Missing request parameter: "+LDAPUtilsConstants.E_DN, null);
 
         Map<String, Object> attrs = AdminService.getAttrs(request);
+        if (attrs.containsKey("zimbraIsAdminAccount") && !authToken.isAdmin()) {
+            throw ServiceException.PERM_DENIED("Can not modify attribute 'zimbraIsAdminAccount'");
+        }
 
         NamedEntry newNe = LDAPUtilsHelper.getInstance().modifyLDAPEntry(dn,  attrs);
 
