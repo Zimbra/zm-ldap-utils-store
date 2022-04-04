@@ -9,7 +9,8 @@
   <dependency org="servlet-api" name="servlet-api" rev="3.1" />
   <dependency org="dom4j" name="dom4j" rev="1.5.2" />
   <dependency org="xerces" name="xercesImpl" rev="2.9.1-patch-01"/>
-  <dependency org="log4j" name="log4j" rev="1.2.16" />
+  <dependency org="org.apache.logging.log4j" name="log4j-core" rev="${log4j.core.version}" />
+  <dependency org="org.apache.logging.log4j" name="log4j-api" rev="${log4j.api.version}" />
   <dependency org="org.json" name="json" rev="20090211" />
   <dependency org="com.google.guava" name="guava" rev="23.0" />
   <dependency org="commons-httpclient" name="commons-httpclient" rev="3.1" />
